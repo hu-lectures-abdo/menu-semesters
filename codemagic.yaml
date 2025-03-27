@@ -3,7 +3,8 @@ workflows:
     name: Build Android APK
     instance_type: mac_mini_m1
     environment:
-      node: latest
+      node: latest  # استخدام أحدث إصدار من Node.js
+
     scripts:
       - name: تثبيت Cordova والاعتماديات
         script: |
@@ -11,14 +12,18 @@ workflows:
           cordova create myApp
           cd myApp
           cordova platform add android
-          cp -r $CM_CLONE_DIR/* myApp/www/
+          mkdir -p www  # إنشاء المجلد إذا لم يكن موجودًا
+          cp -r $CM_CLONE_DIR/* www/  # نسخ ملفات HTML و CSS إلى www/
+
       - name: بناء APK
         script: |
           cd myApp
           cordova build android
+
     artifacts:
       - myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+
     publishing:
       email:
         recipients:
-          - "hu.lectures.abdo@gmail.com"  # ضع بريدك الإلكتروني هنا
+          - "hu.lectures.abdo@gmail.com"  # استبدلها ببريدك الإلكتروني
