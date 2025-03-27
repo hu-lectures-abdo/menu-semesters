@@ -1,29 +1,28 @@
 workflows:
-  flutter-app:
-    name: Flutter Build
-    max_build_duration: 60
-    instance_type: mac_mini_m1
+  web-app:
+    name: Web Build
+    max_build_duration: 30
+    instance_type: mac_mini
     environment:
-      flutter: stable
-      xcode: latest
+      node: latest  # يستخدم أحدث إصدار من Node.js
 
     scripts:
-      - name: Fetch Flutter dependencies
-        script: flutter pub get
-
-      - name: Run tests
-        script: flutter test
-
-      - name: Build iOS
+      - name: Install dependencies (إذا كنت تستخدم npm)
         script: |
-          flutter build ipa --release --no-codesign
-          mkdir -p build/ios/ipa
-          mv build/ios/archive/MyApp.xcarchive build/ios/ipa/
+          if [ -f package.json ]; then
+            npm install
+          fi
 
-      - name: Build Android
-        script: flutter build apk --release
+      - name: Build project (إذا كنت تستخدم أدوات مثل Webpack أو Vite)
+        script: |
+          if [ -f package.json ]; then
+            npm run build
+          fi
 
     artifacts:
-      - build/**/outputs/**/*.apk
-      - build/ios/ipa/*.ipa
+      - build/  # مسار مجلد الإخراج النهائي (إذا كنت تبني المشروع)
 
+    publishing:
+      email:
+        recipients:
+          - "hu.lectures.abdo@gmail.com"  # استبدلها ببريدك الإلكتروني
