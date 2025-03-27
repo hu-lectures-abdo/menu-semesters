@@ -1,28 +1,28 @@
 workflows:
-  web-app:
-    name: Web Build
-    max_build_duration: 30
+  android-app:
+    name: Android APK Build
+    max_build_duration: 60
     instance_type: mac_mini_m1
     environment:
-      node: latest  # يستخدم أحدث إصدار من Node.js
+      vars:
+        PACKAGE_NAME: "com.hulectures.myapp"  # استبدلها بحزمة تطبيقك
+      node: latest
+      java: 17  # تأكد من استخدام إصدار متوافق مع مشروعك
 
     scripts:
-      - name: Install dependencies (إذا كنت تستخدم npm)
+      - name: Install dependencies
         script: |
-          if [ -f package.json ]; then
-            npm install
-          fi
+          npm install
 
-      - name: Build project (إذا كنت تستخدم أدوات مثل Webpack أو Vite)
+      - name: Build Android APK
         script: |
-          if [ -f package.json ]; then
-            npm run build
-          fi
+          cd android
+          ./gradlew assembleRelease
 
     artifacts:
-      - build/  # مسار مجلد الإخراج النهائي (إذا كنت تبني المشروع)
+      - android/app/build/outputs/apk/release/app-release.apk  # هذا هو ملف APK النهائي
 
     publishing:
       email:
         recipients:
-          - "hu.lectures.abdo@gmail.com"  # استبدلها ببريدك الإلكتروني
+          - "hu.lectures.abdo@gmail.com"
