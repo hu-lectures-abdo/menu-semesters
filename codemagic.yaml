@@ -1,29 +1,35 @@
 workflows:
-  android-apk:
-    name: Build Android APK
-    instance_type: mac_mini_m1
+  web-app:
+    name: Web Build
+    max_build_duration: 30
+    instance_type: mac_pro  # استخدام جهاز mac_pro للحصول على مساحة أكبر
     environment:
-      node: latest  # استخدام أحدث إصدار من Node.js
+      node: latest  # أحدث إصدار من Node.js
 
     scripts:
-      - name: تثبيت Cordova والاعتماديات
+      - name: Clean up disk space
         script: |
-          npm install -g cordova
-          cordova create myApp
-          cd myApp
-          cordova platform add android
-          mkdir -p www  # إنشاء المجلد إذا لم يكن موجودًا
-          cp -r $CM_CLONE_DIR/* www/  # نسخ ملفات HTML و CSS إلى www/
+          df -h  # عرض المساحة قبل التنظيف
+          rm -rf ~/.gradle/caches/
+          rm -rf ~/.gradle/wrapper/
+          rm -rf ~/.pub-cache/
+          df -h  # عرض المساحة بعد التنظيف
 
-      - name: بناء APK
+      - name: Skip heavy build steps (لحفظ المساحة)
+        script: echo "Skipping unnecessary build steps to save space"
+
+      - name: Install dependencies (إذا كنت تستخدم npm)
         script: |
-          cd myApp
-          cordova build android
+          if [ -f package.json ]; then
+            npm install
+          fi
+
+      - name: Build project (إذا كنت تستخدم Webpack أو Vite)
+        script: |
+          if [ -f package.json ]; then
+            npm run build
+          fi
 
     artifacts:
-      - myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
-
-    publishing:
-      email:
-        recipients:
-          - "hu.lectures.abdo@gmail.com"  # استبدلها ببريدك الإلكتروني
+      - build/**/*.apk  # فقط ملفات APK المطلوبة (إذا كان هناك بناء Android)
+      - build/index.html  # ملف HTML الرئيسي فقط
