@@ -1,35 +1,35 @@
 workflows:
-  web-app:
-    name: Web Build
+  android-build:
+    name: Android APK Build
     max_build_duration: 30
-    instance_type: mac_pro  # استخدام جهاز mac_pro للحصول على مساحة أكبر
+    instance_type: mac_pro  # استخدام جهاز mac_pro لموارد أكثر
     environment:
-      node: latest  # أحدث إصدار من Node.js
+      vars:
+        PACKAGE_NAME: "com.hulectures.myapp"  # ضع اسم الباكيج هنا
+      flutter: stable  # إذا كان مشروعك Flutter
+      node: latest     # إذا كان يستخدم npm
 
     scripts:
       - name: Clean up disk space
         script: |
-          df -h  # عرض المساحة قبل التنظيف
+          df -h
           rm -rf ~/.gradle/caches/
           rm -rf ~/.gradle/wrapper/
           rm -rf ~/.pub-cache/
-          df -h  # عرض المساحة بعد التنظيف
+          df -h
 
-      - name: Skip heavy build steps (لحفظ المساحة)
-        script: echo "Skipping unnecessary build steps to save space"
-
-      - name: Install dependencies (إذا كنت تستخدم npm)
+      - name: Install dependencies (إذا كان مشروعك npm)
         script: |
           if [ -f package.json ]; then
             npm install
           fi
 
-      - name: Build project (إذا كنت تستخدم Webpack أو Vite)
+      - name: Build APK
         script: |
-          if [ -f package.json ]; then
-            npm run build
+          if [ -d android ]; then
+            cd android
+            ./gradlew assembleRelease
           fi
 
     artifacts:
-      - build/**/*.apk  # فقط ملفات APK المطلوبة (إذا كان هناك بناء Android)
-      - build/index.html  # ملف HTML الرئيسي فقط
+      - android/app/build/outputs/**/*.apk  # حفظ ملف APK النهائي
