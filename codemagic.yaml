@@ -1,28 +1,24 @@
 workflows:
-  android-app:
-    name: Android APK Build
-    max_build_duration: 60
+  android-apk:
+    name: Build Android APK
     instance_type: mac_mini_m1
     environment:
-      vars:
-        PACKAGE_NAME: "com.hulectures.myapp"  # استبدلها بحزمة تطبيقك
       node: latest
-      java: 17  # تأكد من استخدام إصدار متوافق مع مشروعك
-
     scripts:
-      - name: Install dependencies
+      - name: تثبيت Cordova والاعتماديات
         script: |
-          npm install
-
-      - name: Build Android APK
+          npm install -g cordova
+          cordova create myApp
+          cd myApp
+          cordova platform add android
+          cp -r $CM_CLONE_DIR/* myApp/www/
+      - name: بناء APK
         script: |
-          cd android
-          ./gradlew assembleRelease
-
+          cd myApp
+          cordova build android
     artifacts:
-      - android/app/build/outputs/apk/release/app-release.apk  # هذا هو ملف APK النهائي
-
+      - myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
     publishing:
       email:
         recipients:
-          - "hu.lectures.abdo@gmail.com"
+          - "hu.lectures.abdo@gmail.com"  # ضع بريدك الإلكتروني هنا
