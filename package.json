@@ -1,1 +1,13 @@
+{
+  "name": "HU LECTURES",
+  "version": "1.0.0",
+  "description": "HU LECTURES",
+  "scripts": {
+    "start": "node index.js",
+    "build": "webpack"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
 
